@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+{% block title %}Reports{% endblock %}
+{% block content %}
+<h1>Logs</h1>
+<div class="mb-3">
+  {% if session['user'].get('role') == 'admin' %}
+    <a class="btn btn-sm btn-outline-secondary" href="{{ url_for('export_logs') }}">Export CSV</a>
+  {% endif %}
+</div>
+
+<div class="card">
+  <div class="card-body">
+    <div class="table-responsive">
+      <table class="table table-sm">
+        <thead><tr><th>ts</th><th>device_id</th><th>action</th><th>meta</th></tr></thead>
+        <tbody>
+          {% for l in logs %}
+            <tr><td>{{ l.ts }}</td><td>{{ l.device_id }}</td><td>{{ l.action }}</td><td>{{ l.meta }}</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

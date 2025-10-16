@@ -1,0 +1,62 @@
+{% extends "layout.html" %}
+{% block title %}Manage Staff{% endblock %}
+{% block content %}
+<h1>Staff Management</h1>
+<div class="card mb-3">
+  <div class="card-body">
+    <h5>Add Staff</h5>
+    <form method="post" action="{{ url_for('add_staff') }}" class="row g-2">
+      <div class="col-md-3"><input class="form-control" name="staffID" placeholder="Staff ID" required></div>
+      <div class="col-md-3"><input class="form-control" name="phone" placeholder="Phone"></div>
+      <div class="col-md-3"><input class="form-control" name="password" placeholder="Password" required></div>
+      <div class="col-md-2">
+        <select class="form-select" name="role">
+          <option value="staff">Staff</option>
+          <option value="admin">Admin</option>
+        </select>
+      </div>
+      <div class="col-md-1">
+        <button class="btn btn-primary w-100" type="submit">Add</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-body">
+    <h5>Existing Staff</h5>
+    <div class="table-responsive">
+      <table class="table table-sm align-middle">
+        <thead><tr><th>StaffID</th><th>Phone</th><th>Role</th><th>Actions</th></tr></thead>
+        <tbody>
+          {% for s in staff %}
+            {% if s.staffID != session['user'].get('staffID') %}
+              <tr>
+                <td>{{ s.staffID }}</td>
+                <td>{{ s.phone }}</td>
+                <td>{{ s.role }}</td>
+                <td>
+                  <form method="post" action="{{ url_for('edit_staff') }}" class="d-inline-block me-1">
+                    <input type="hidden" name="id" value="{{ s.id }}">
+                    <input type="text" name="phone" value="{{ s.phone }}" class="form-control form-control-sm d-inline-block" style="width:120px;">
+                    <select name="role" class="form-select form-select-sm d-inline-block" style="width:120px; display:inline-block;">
+                      <option value="staff" {% if s.role=='staff' %}selected{% endif %}>Staff</option>
+                      <option value="admin" {% if s.role=='admin' %}selected{% endif %}>Admin</option>
+                    </select>
+                    <button class="btn btn-sm btn-success" type="submit">Save</button>
+                  </form>
+
+                  <form method="post" action="{{ url_for('delete_staff') }}" class="d-inline-block" onsubmit="return confirm('Delete this staff?');">
+                    <input type="hidden" name="id" value="{{ s.id }}">
+                    <button class="btn btn-sm btn-danger">Delete</button>
+                  </form>
+                </td>
+              </tr>
+            {% endif %}
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,31 @@
+{% extends "layout.html" %}
+{% block title %}Admin Dashboard{% endblock %}
+{% block content %}
+<h1>Admin Dashboard</h1>
+<div class="row">
+  <div class="col-md-4">
+    <div class="card mb-3">
+      <div class="card-body">
+        <h5>Total Laptops</h5>
+        <p class="display-6">{{ stats.laptops }}</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card mb-3">
+      <div class="card-body">
+        <h5>Total Students</h5>
+        <p class="display-6">{{ stats.students }}</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card mb-3">
+      <div class="card-body">
+        <h5>Total Staff</h5>
+        <p class="display-6">{{ stats.staff }}</p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

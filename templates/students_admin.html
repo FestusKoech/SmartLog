@@ -1,0 +1,33 @@
+{% extends "layout.html" %}
+{% block title %}Students{% endblock %}
+{% block content %}
+<h1>Students</h1>
+
+<div class="card mb-3">
+  <div class="card-body">
+    <h5>Register Student</h5>
+    <form method="post" action="{{ url_for('staff_register_student') }}" class="row g-2">
+      <div class="col-md-3"><input class="form-control" name="studentID" placeholder="Student ID" required></div>
+      <div class="col-md-4"><input class="form-control" name="name" placeholder="Full name" required></div>
+      <div class="col-md-3"><input class="form-control" name="phone" placeholder="Phone"></div>
+      <div class="col-md-2"><button class="btn btn-primary w-100" type="submit">Register</button></div>
+    </form>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-body">
+    <h5>Existing Students</h5>
+    <div class="table-responsive">
+      <table class="table table-sm">
+        <thead><tr><th>StudentID</th><th>Name</th><th>Phone</th></tr></thead>
+        <tbody>
+          {% for s in students %}
+            <tr><td>{{ s.studentID }}</td><td>{{ s.name }}</td><td>{{ s.phone }}</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,82 @@
+{% extends "layout.html" %}
+{% block title %}Laptops{% endblock %}
+{% block content %}
+<h1>Laptops</h1>
+
+<div class="card mb-3">
+  <div class="card-body">
+    <h5>Add / Edit Laptop + Student (Admin)</h5>
+    <form method="post" action="{{ url_for('save_laptop') }}" id="laptopForm" class="row g-2 align-items-center">
+      <input type="hidden" name="id" id="laptopFormId">
+      <div class="col-md-3"><input class="form-control" name="name" id="lf_name" placeholder="Student full name" required></div>
+      <div class="col-md-2"><input class="form-control" name="studentID" id="lf_studentID" placeholder="Student ID" required></div>
+      <div class="col-md-2"><input class="form-control" name="phone" id="lf_phone" placeholder="Phone"></div>
+      <div class="col-md-2"><input class="form-control" name="serial_number" id="lf_serial" placeholder="Serial number" required></div>
+      <div class="col-md-2"><input class="form-control" name="make" id="lf_make" placeholder="Make" required></div>
+      <div class="col-md-1"><input class="form-control" name="model" id="lf_model" placeholder="Model"></div>
+      <div class="col-12 mt-2">
+        <button class="btn btn-primary" type="submit">Save</button>
+        <button type="button" class="btn btn-outline-secondary" id="laptopClear">Clear</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-body">
+    <h5>Existing Laptops</h5>
+    <div class="table-responsive">
+      <table class="table table-hover table-sm align-middle" id="laptopsTable">
+        <thead><tr><th>Student</th><th>StudentID</th><th>Phone</th><th>Serial</th><th>Make</th><th>Model</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody>
+          {% for l in laptops %}
+            <tr data-id="{{ l.id }}" data-name="{{ l.name|e }}" data-studentid="{{ l.studentID|e }}" data-phone="{{ l.phone|e }}" data-serial="{{ l.serial_number|e }}" data-make="{{ l.make|e }}" data-model="{{ l.model|e }}" data-signed="{{ l.signed_in }}">
+              <td>{{ l.name }}</td>
+              <td>{{ l.studentID }}</td>
+              <td>{{ l.phone }}</td>
+              <td>{{ l.serial_number }}</td>
+              <td>{{ l.make }}</td>
+              <td>{{ l.model }}</td>
+              <td>{% if l.signed_in %}<span class="badge bg-success">Signed in</span>{% else %}<span class="badge bg-secondary">Signed out</span>{% endif %}</td>
+              <td>
+                <button class="btn btn-sm btn-outline-primary edit-laptop">Edit</button>
+                {% if session['user'].get('role') == 'admin' %}
+                <form method="post" action="{{ url_for('delete_laptop_route') }}" class="d-inline-block" onsubmit="return confirm('Delete this record?');">
+                  <input type="hidden" name="id" value="{{ l.id }}">
+                  <button class="btn btn-sm btn-danger">Delete</button>
+                </form>
+                {% endif %}
+                <button class="btn btn-sm btn-outline-success open-record" data-id="{{ l.id }}" data-signed="{{ l.signed_in }}">Open</button>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Sign modal -->
+<div class="modal fade" id="signModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form id="signForm" method="post" action="{{ url_for('sign_action') }}">
+        <div class="modal-header">
+          <h5 class="modal-title">Record</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <p id="signModalInfo"></p>
+          <input type="hidden" name="id" id="sign_id">
+          <input type="hidden" name="action" id="sign_action">
+          <input type="hidden" name="ajax" value="1">
+        </div>
+        <div class="modal-footer">
+          <button type="submit" id="signActionBtn" class="btn btn-primary"></button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

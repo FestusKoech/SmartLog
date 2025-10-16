@@ -1,0 +1,17 @@
+# Core Flask framework
+Flask==3.0.3
+
+# MySQL database connector (with pooling support)
+mysql-connector-python==9.0.0
+
+# Password hashing
+bcrypt==4.2.0
+
+# Environment variable management
+python-dotenv==1.0.1
+
+# Date and time helpers (optional but useful for reports)
+pytz==2024.1
+
+# Optional: gunicorn for production deployment
+gunicorn==23.0.0

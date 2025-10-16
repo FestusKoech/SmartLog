@@ -1,0 +1,5 @@
+/* style.css - small overrides */
+body { background:#f8fafc; }
+.navbar-brand { font-weight:700; }
+.card { border-radius:8px; }
+.table td, .table th { vertical-align: middle; }
