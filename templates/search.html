@@ -1,53 +1,43 @@
 {% extends "layout.html" %}
-{% block title %}Search{% endblock %}
 {% block content %}
-<h1>Search results for '{{ q }}'</h1>
+  <h4>Search results for "{{ q }}"</h4>
 
-<div class="card mb-3">
-  <div class="card-body">
-    {% if results|length == 0 %}
-      <p>No results.</p>
-    {% else %}
-      <div class="table-responsive">
-        <table class="table table-sm align-middle">
-          <thead><tr><th>Student</th><th>StudentID</th><th>Serial</th><th>Make</th><th>Model</th><th>Status</th><th>Actions</th></tr></thead>
-          <tbody>
-            {% for r in results %}
-              <tr data-id="{{ r.id }}" data-serial="{{ r.serial_number }}" data-signed="{{ r.signed_in }}">
-                <td>{{ r.name }}</td>
-                <td>{{ r.studentID }}</td>
-                <td>{{ r.serial_number }}</td>
-                <td>{{ r.make }}</td>
-                <td>{{ r.model }}</td>
-                <td>{% if r.signed_in %}<span class="badge bg-success">Signed in</span>{% else %}<span class="badge bg-secondary">Signed out</span>{% endif %}</td>
-                <td>
-                  <button class="btn btn-sm btn-outline-primary open-record" data-id="{{ r.id }}" data-signed="{{ r.signed_in }}">Open</button>
-                </td>
-              </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
-    {% endif %}
-  </div>
-</div>
+  {% if laptops %}
+    <h5 class="mt-4 text-primary">Laptops</h5>
+    <table class="table table-striped">
+      <thead><tr><th>Name</th><th>Student ID</th><th>Serial</th><th>Make</th><th>Model</th><th>Signed In</th></tr></thead>
+      <tbody>
+        {% for l in laptops %}
+          <tr>
+            <td>{{ l.name }}</td>
+            <td>{{ l.studentID }}</td>
+            <td>{{ l.serial_number }}</td>
+            <td>{{ l.make }}</td>
+            <td>{{ l.model }}</td>
+            <td>{{ 'Yes' if l.signed_in else 'No' }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% endif %}
 
-<!-- sign modal -->
-<div class="modal fade" id="signModal" tabindex="-1">
-  <div class="modal-dialog"><div class="modal-content">
-    <form id="signForm" method="post" action="{{ url_for('sign_action') }}">
-      <div class="modal-header"><h5 class="modal-title">Record</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
-      <div class="modal-body">
-        <p id="signModalInfo"></p>
-        <input type="hidden" name="id" id="sign_id">
-        <input type="hidden" name="action" id="sign_action">
-        <input type="hidden" name="ajax" value="1">
-      </div>
-      <div class="modal-footer">
-        <button type="submit" id="signActionBtn" class="btn btn-primary"></button>
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-      </div>
-    </form>
-  </div></div>
-</div>
+  {% if students %}
+    <h5 class="mt-4 text-success">Students (without laptops)</h5>
+    <table class="table table-striped">
+      <thead><tr><th>Student ID</th><th>Name</th><th>Phone</th></tr></thead>
+      <tbody>
+        {% for s in students %}
+          <tr>
+            <td>{{ s.studentID }}</td>
+            <td>{{ s.name }}</td>
+            <td>{{ s.phone }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% endif %}
+
+  {% if not laptops and not students %}
+    <div class="alert alert-warning mt-3">No matching records found.</div>
+  {% endif %}
 {% endblock %}

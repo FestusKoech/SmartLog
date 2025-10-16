@@ -1,21 +1,39 @@
 {% extends "layout.html" %}
 {% block title %}Laptops{% endblock %}
 {% block content %}
-<h1>Laptops</h1>
 
 <div class="card mb-3">
   <div class="card-body">
-    <h5>Add / Edit Laptop + Student (Admin)</h5>
+    <h5>Manage Laptops (Admin only)</h5>
     <form method="post" action="{{ url_for('save_laptop') }}" id="laptopForm" class="row g-2 align-items-center">
       <input type="hidden" name="id" id="laptopFormId">
-      <div class="col-md-3"><input class="form-control" name="name" id="lf_name" placeholder="Student full name" required></div>
-      <div class="col-md-2"><input class="form-control" name="studentID" id="lf_studentID" placeholder="Student ID" required></div>
-      <div class="col-md-2"><input class="form-control" name="phone" id="lf_phone" placeholder="Phone"></div>
-      <div class="col-md-2"><input class="form-control" name="serial_number" id="lf_serial" placeholder="Serial number" required></div>
-      <div class="col-md-2"><input class="form-control" name="make" id="lf_make" placeholder="Make" required></div>
-      <div class="col-md-1"><input class="form-control" name="model" id="lf_model" placeholder="Model"></div>
+
+      <div class="col-md-3">
+        <input class="form-control" name="name" id="lf_name" placeholder="Student full name" required readonly>
+      </div>
+
+      <div class="col-md-2">
+        <input class="form-control" name="studentID" id="lf_studentID" placeholder="Student ID" required readonly>
+      </div>
+
+      <div class="col-md-2">
+        <input class="form-control" name="phone" id="lf_phone" placeholder="Phone" readonly>
+      </div>
+
+      <div class="col-md-2">
+        <input class="form-control" name="serial_number" id="lf_serial" placeholder="Serial number" required readonly>
+      </div>
+
+      <div class="col-md-2">
+        <input class="form-control" name="make" id="lf_make" placeholder="Make" required readonly>
+      </div>
+
+      <div class="col-md-1">
+        <input class="form-control" name="model" id="lf_model" placeholder="Model" readonly>
+      </div>
+
       <div class="col-12 mt-2">
-        <button class="btn btn-primary" type="submit">Save</button>
+        <button class="btn btn-primary" type="submit" id="lf_save" disabled>Save</button>
         <button type="button" class="btn btn-outline-secondary" id="laptopClear">Clear</button>
       </div>
     </form>
@@ -24,32 +42,51 @@
 
 <div class="card">
   <div class="card-body">
-    <h5>Existing Laptops</h5>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h5 class="mb-0">Existing Laptops</h5>
+      <button class="btn btn-primary" id="openAddLaptopBtn">+ Add New Laptop</button>
+    </div>
+
     <div class="table-responsive">
-      
-      <table class="table table-hover table-sm align-middle" id="laptopsTable">
-        <thead><tr><th>Student</th><th>StudentID</th><th>Phone</th><th>Serial</th><th>Make</th><th>Model</th><th>Status</th><th>Actions</th></tr></thead>
+      <table class="table table-hover table-sm align-middle custom-table" id="laptopsTable">
+        <thead>
+          <tr><th>Student</th><th>StudentID</th><th>Phone</th><th>Serial</th><th>Make</th><th>Model</th><th>Status</th><th>Actions</th></tr>
+        </thead>
         <tbody>
           {% for l in laptops %}
-            <tr data-id="{{ l.id }}" data-name="{{ l.name|e }}" data-studentid="{{ l.studentID|e }}" data-phone="{{ l.phone|e }}" data-serial="{{ l.serial_number|e }}" data-make="{{ l.make|e }}" data-model="{{ l.model|e }}" data-signed="{{ l.signed_in }}">
-              <td>{{ l.name }}</td>
-              <td>{{ l.studentID }}</td>
-              <td>{{ l.phone }}</td>
-              <td>{{ l.serial_number }}</td>
-              <td>{{ l.make }}</td>
-              <td>{{ l.model }}</td>
-              <td>{% if l.signed_in %}<span class="badge bg-success">Signed in</span>{% else %}<span class="badge bg-secondary">Signed out</span>{% endif %}</td>
-              <td>
-                <button class="btn btn-sm btn-outline-primary edit-laptop">Edit</button>
-                {% if session['user'].get('role') == 'admin' %}
-                <form method="post" action="{{ url_for('delete_laptop_route') }}" class="d-inline-block" onsubmit="return confirm('Delete this record?');">
-                  <input type="hidden" name="id" value="{{ l.id }}">
-                  <button class="btn btn-sm btn-danger">Delete</button>
-                </form>
-                {% endif %}
-                <button class="btn btn-sm btn-outline-success open-record" data-id="{{ l.id }}" data-signed="{{ l.signed_in }}">Open</button>
-              </td>
-            </tr>
+          <tr
+            data-id="{{ l.id }}"
+            data-name="{{ l.name|e }}"
+            data-studentid="{{ l.studentID|e }}"
+            data-phone="{{ l.phone|e }}"
+            data-serial="{{ l.serial_number|e }}"
+            data-make="{{ l.make|e }}"
+            data-model="{{ l.model|e }}"
+            data-signed="{{ l.signed_in }}">
+            <td>{{ l.name }}</td>
+            <td>{{ l.studentID }}</td>
+            <td>{{ l.phone }}</td>
+            <td>{{ l.serial_number }}</td>
+            <td>{{ l.make }}</td>
+            <td>{{ l.model }}</td>
+            <td>
+              {% if l.signed_in %}
+                <span class="badge bg-success">Signed in</span>
+              {% else %}
+                <span class="badge bg-secondary">Signed out</span>
+              {% endif %}
+            </td>
+            <td>
+              <button class="btn btn-sm btn-outline-primary edit-laptop">Edit</button>
+              {% if session['user'].get('role') == 'admin' %}
+              <form method="post" action="{{ url_for('delete_laptop_route') }}" class="d-inline-block" onsubmit="return confirm('Delete this record?');">
+                <input type="hidden" name="id" value="{{ l.id }}">
+                <button class="btn btn-sm btn-danger">Delete</button>
+              </form>
+              {% endif %}
+              <button class="btn btn-sm btn-outline-success open-record" data-id="{{ l.id }}" data-signed="{{ l.signed_in }}">Open</button>
+            </td>
+          </tr>
           {% endfor %}
         </tbody>
       </table>
@@ -57,20 +94,39 @@
   </div>
 </div>
 
-<!-- Sign action area (modal) -->
-<div class="modal fade" id="signModal" tabindex="-1">
+<!-- ADD NEW LAPTOP MODAL -->
+<div class="modal fade" id="addLaptopModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-sm modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Select Student</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <label class="form-label">Search by name, phone, or student ID</label>
+        <input type="search" id="addStudentSearch" class="form-control" placeholder="Type to search..." autocomplete="off">
+        <div id="addStudentResults" class="list-group mt-2" style="max-height:260px; overflow:auto;"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SIGN IN/OUT MODAL -->
+<div class="modal fade" id="signModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
-      <form id="signForm" method="post" action="{{ url_for('sign_action') }}">
+      <form method="post" action="{{ url_for('sign_action') }}">
         <div class="modal-header">
-          <h5 class="modal-title" id="signModalTitle">Record</h5>
+          <h5 class="modal-title" id="signModalTitle">Record Action</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
         <div class="modal-body">
           <p id="signModalInfo"></p>
           <input type="hidden" name="id" id="sign_id">
           <input type="hidden" name="action" id="sign_action">
-          <input type="hidden" name="ajax" value="1">
         </div>
         <div class="modal-footer">
           <button type="submit" id="signActionBtn" class="btn btn-primary"></button>
@@ -80,5 +136,138 @@
     </div>
   </div>
 </div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  const laptopForm = document.getElementById('laptopForm');
+  const idField = document.getElementById('laptopFormId');
+  const nameField = document.getElementById('lf_name');
+  const studentIDField = document.getElementById('lf_studentID');
+  const phoneField = document.getElementById('lf_phone');
+  const serialField = document.getElementById('lf_serial');
+  const makeField = document.getElementById('lf_make');
+  const modelField = document.getElementById('lf_model');
+  const saveBtn = document.getElementById('lf_save');
+  const clearBtn = document.getElementById('laptopClear');
+
+  function enableLaptopFields() {
+    serialField.readOnly = false;
+    makeField.readOnly = false;
+    modelField.readOnly = false;
+    phoneField.readOnly = false;
+    saveBtn.disabled = false;
+  }
+  function disableAllFields() {
+    nameField.readOnly = true;
+    studentIDField.readOnly = true;
+    phoneField.readOnly = true;
+    serialField.readOnly = true;
+    makeField.readOnly = true;
+    modelField.readOnly = true;
+    saveBtn.disabled = true;
+    idField.value = "";
+  }
+
+  disableAllFields();
+
+  clearBtn.addEventListener('click', function() {
+    laptopForm.reset();
+    disableAllFields();
+  });
+
+  document.querySelectorAll('.edit-laptop').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const tr = this.closest('tr');
+      idField.value = tr.dataset.id;
+      nameField.value = tr.dataset.name;
+      studentIDField.value = tr.dataset.studentid;
+      phoneField.value = tr.dataset.phone;
+      serialField.value = tr.dataset.serial;
+      makeField.value = tr.dataset.make;
+      modelField.value = tr.dataset.model;
+      enableLaptopFields();
+      nameField.readOnly = true;
+      studentIDField.readOnly = true;
+      laptopForm.scrollIntoView({behavior: 'smooth', block: 'center'});
+    });
+  });
+
+  const addBtn = document.getElementById('openAddLaptopBtn');
+  const addModal = new bootstrap.Modal(document.getElementById('addLaptopModal'), {keyboard:true});
+  addBtn.addEventListener('click', () => {
+    document.getElementById('addStudentSearch').value = '';
+    document.getElementById('addStudentResults').innerHTML = '';
+    addModal.show();
+  });
+
+  const searchInput = document.getElementById('addStudentSearch');
+  const resultsDiv = document.getElementById('addStudentResults');
+  let searchTimer = null;
+  searchInput.addEventListener('input', function() {
+    const q = this.value.trim();
+    resultsDiv.innerHTML = '';
+    if (searchTimer) clearTimeout(searchTimer);
+    if (q.length < 2) return;
+    searchTimer = setTimeout(() => {
+      fetch(`/search_student?q=${encodeURIComponent(q)}`)
+        .then(r => r.ok ? r.json() : Promise.reject('Network'))
+        .then(data => {
+          resultsDiv.innerHTML = '';
+          if (!Array.isArray(data) || data.length === 0) {
+            resultsDiv.innerHTML = '<div class="list-group-item">No results</div>';
+            return;
+          }
+          data.forEach(s => {
+            const it = document.createElement('button');
+            it.type = 'button';
+            it.className = 'list-group-item list-group-item-action';
+            it.innerText = `${s.name} (${s.student_id}) ${s.phone ? ' - ' + s.phone : ''}`;
+            it.addEventListener('click', function() {
+              idField.value = '';
+              nameField.value = s.name;
+              studentIDField.value = s.student_id;
+              phoneField.value = s.phone;
+              enableLaptopFields();
+              addModal.hide();
+              laptopForm.scrollIntoView({behavior:'smooth', block:'center'});
+            });
+            resultsDiv.appendChild(it);
+          });
+        })
+        .catch(() => resultsDiv.innerHTML = '<div class="list-group-item text-danger">Search error</div>');
+    }, 300);
+  });
+
+  // Restore OPEN button (sign in/out)
+  const signModal = new bootstrap.Modal(document.getElementById('signModal'));
+  const signId = document.getElementById('sign_id');
+  const signAction = document.getElementById('sign_action');
+  const signInfo = document.getElementById('signModalInfo');
+  const signBtn = document.getElementById('signActionBtn');
+  const signTitle = document.getElementById('signModalTitle');
+
+  document.querySelectorAll('.open-record').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const tr = this.closest('tr');
+      const id = tr.dataset.id;
+      const signed = tr.dataset.signed === 'True';
+      const name = tr.dataset.name;
+      const studentid = tr.dataset.studentid;
+      const action = signed ? 'sign_out' : 'sign_in';
+      const label = signed ? 'Sign Out' : 'Sign In';
+
+      signId.value = id;
+      signAction.value = action;
+      signTitle.textContent = label + " Record";
+      signBtn.textContent = label;
+      signBtn.className = `btn btn-${signed ? 'danger' : 'success'}`;
+      signInfo.textContent = `${label} laptop for ${name} (${studentid})?`;
+
+      signModal.show();
+    });
+  });
+
+});
+</script>
 
 {% endblock %}

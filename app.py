@@ -1,4 +1,5 @@
 # app.py
+
 from flask import (
     Flask, render_template, request, redirect, session, jsonify,
     url_for, flash, send_file
@@ -239,6 +240,36 @@ def staff_register_student():
         conn.close()
     return redirect(url_for('students_page'))
 
+
+
+
+
+
+@app.route('/students/edit', methods=['POST'])
+def edit_student():
+    if not require_login():
+        return redirect(url_for('login'))
+    sid = request.form.get('id')
+    studentID = request.form.get('studentID', '').strip()
+    name = request.form.get('name', '').strip()
+    phone = request.form.get('phone', '').strip()
+    if not sid or not studentID or not name:
+        flash("All fields except phone are required.")
+        return redirect(url_for('students_page'))
+    conn = get_db()
+    cur = conn.cursor()
+    try:
+        cur.execute("UPDATE students SET studentID=%s, name=%s, phone=%s WHERE id=%s",
+                    (studentID, name, phone, sid))
+        conn.commit()
+        flash("Student updated successfully.")
+    except Exception as e:
+        conn.rollback()
+        flash("DB error: " + str(e))
+    finally:
+        conn.close()
+    return redirect(url_for('students_page'))
+
 # -------------------------
 # Laptops (combined table)
 # Admin: create/edit/delete
@@ -320,11 +351,15 @@ def delete_laptop_route():
 @app.route('/search', methods=['GET'])
 def search():
     q = (request.args.get('q') or "").strip()
-    results = []
+    laptop_results = []
+    student_results = []
+
     if q:
         conn = get_db()
         cur = conn.cursor(dictionary=True)
         likeq = f"%{q}%"
+
+        # Search in laptops
         cur.execute("""
             SELECT id, name, studentID, phone, serial_number, make, model, signed_in, ts_updated
             FROM laptops
@@ -332,15 +367,57 @@ def search():
             ORDER BY ts_updated DESC
             LIMIT 200
         """, (likeq, likeq, likeq))
-        results = cur.fetchall()
+        laptop_results = cur.fetchall()
+
+        # Search in students (even those without laptops)
+        cur.execute("""
+            SELECT id, studentID, name, phone, ts_created
+            FROM students
+            WHERE studentID LIKE %s OR name LIKE %s OR phone LIKE %s
+            ORDER BY ts_created DESC
+            LIMIT 200
+        """, (likeq, likeq, likeq))
+        student_results = cur.fetchall()
+
         conn.close()
+
     if request.headers.get('Accept') == 'application/json' or request.args.get('format') == 'json':
-        return jsonify(results)
-    return render_template('search.html', results=results, q=q)
+        return jsonify({'laptops': laptop_results, 'students': student_results})
+
+    return render_template('search.html', laptops=laptop_results, students=student_results, q=q)
+
 
 # -------------------------
 # Sign in / Sign out
 # -------------------------
+@app.route('/search_student')
+def search_student():
+    q = (request.args.get('q') or '').strip()
+    if not q:
+        return jsonify([])
+    conn = get_db()
+    cur = conn.cursor(dictionary=True)
+    likeq = f"%{q}%"
+    cur.execute("""
+        SELECT id, studentID AS student_id, name, phone
+        FROM students
+        WHERE name LIKE %s OR phone LIKE %s OR studentID LIKE %s
+        ORDER BY name
+        LIMIT 20
+    """, (likeq, likeq, likeq))
+    rows = cur.fetchall()
+    conn.close()
+    # normalize: ensure keys match what the frontend expects
+    out = []
+    for r in rows:
+        out.append({
+            'id': r.get('id'),
+            'student_id': r.get('student_id'),
+            'name': r.get('name'),
+            'phone': r.get('phone')
+        })
+    return jsonify(out)
+
 # -------------------------
 # Sign in / Sign out
 # -------------------------
@@ -423,6 +500,10 @@ def export_logs():
         mem.write(line + "\n")
     mem.seek(0)
     return send_file(io.BytesIO(mem.getvalue().encode('utf-8')), mimetype='text/csv', as_attachment=True, download_name='logs.csv')
+
+
+
+
 
 # -------------------------
 # Run
