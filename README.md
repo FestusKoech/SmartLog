@@ -11,10 +11,10 @@ Functional Objectives of the System
 To enable secure registration and management of students and laptops
 The system allows authorized staff to register new students and laptops efficiently, ensuring that each device is uniquely identified and linked to a valid student record.
 
------Got rid of ------
+################## Got rid of ##################
 To automate laptop tracking using QR code technology
 The system generates and manages unique QR codes for each laptop, enabling real-time verification of laptop entry and exit through quick QR scans at security checkpoints.
-----Got rid of -------
+################## Got rid of ##################
 
 To implement role-based access control for different user levels
 The system restricts access based on user roles—staff can handle student and laptop registration, while admins (and authorized security officers) manage oversight, logs, and system configurations.
