@@ -8,20 +8,15 @@ In partial completion of BSc. Computer Science - Africa Nazarene University
 -- Objectives --
 Functional Objectives of the System
 
-To enable secure registration and management of students and laptops
-The system allows authorized staff to register new students and laptops efficiently, ensuring that each device is uniquely identified and linked to a valid student record.
+The system allows authorized staff to register new students and laptops efficiently.
 
-To implement role-based access control for different user levels
-The system restricts access based on user roles—staff can handle student and laptop registration, while admins (and authorized security officers) manage oversight, logs, and system configurations.
+The system restricts access based on user roles—staff can handle student and laptop registration.
 
-To facilitate real-time monitoring and reporting of laptop movements
-All laptop scans, registrations, and updates are automatically recorded in the system logs, allowing administrators to view, search, and export detailed activity reports for accountability and audits.
+The system enables administrators to view, search, and export detailed activity reports for accountability and auditing purposes.
 
-To enhance search and retrieval of student and laptop records
-The integrated search functionality enables quick lookup of student or laptop details using keywords such as student name, ID, or laptop serial number, improving operational efficiency.
+The system allows quick lookup of student or laptop details using keywords, using search functionality.
 
-To generate comprehensive reports for administrative decision-making
-The system provides visual logs and exportable CSV reports that summarize laptop movements, user actions, and other key data, supporting better management and policy enforcement.
+The system provides visual logs and exportable CSV reports that summarize laptop movements.
 
 ################## Got rid of ##################
 To automate laptop tracking using QR code technology
